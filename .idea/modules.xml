@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidESM.iml" filepath="$PROJECT_DIR$/AndroidESM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-ESM.iml" filepath="$PROJECT_DIR$/android-ESM.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/esmlibrary/esmlibrary.iml" filepath="$PROJECT_DIR$/esmlibrary/esmlibrary.iml" />
     </modules>
