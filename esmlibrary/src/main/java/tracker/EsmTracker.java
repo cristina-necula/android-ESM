@@ -1,10 +1,16 @@
 package tracker;
 
 import android.content.Context;
+import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.UUID;
 
+import models.Action;
+import models.BackButtonAction;
+import models.ButtonAction;
 import models.Session;
 
 /**
@@ -34,5 +40,23 @@ public class EsmTracker {
     public void endSession(){
         session.setEndTime(System.currentTimeMillis());
         // TODO - send local data to server
+    }
+
+    public void traceButtonAction(View view){
+        Action action = new ButtonAction();
+        action.Timestamp = System.currentTimeMillis();
+        action.Tag = view.getTag().toString();
+        EsmTracker.getInstance().traceAction(action);
+    }
+
+    public void traceBackButtonAction(){
+        Action action = new BackButtonAction();
+        action.Timestamp = System.currentTimeMillis();
+        action.Tag = "BackButtonPressed";
+        EsmTracker.getInstance().traceAction(action);
+    }
+
+    public void traceAction(Action action){
+        session.getUserActions().add(action);
     }
 }

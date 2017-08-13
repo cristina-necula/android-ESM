@@ -1,20 +1,20 @@
 package models;
 
 /**
- * Created by Cristina on 5/6/2017.
+ * Created by Cristina on 5/8/2017.
  */
 
 public class Answer {
 
     private String text;
-    private String isSelected;
+    private boolean isSelected;
 
-    public String getIsSelected() {
+    public boolean isSelected() {
         return isSelected;
     }
 
-    public void setIsSelected(String isSelected) {
-        this.isSelected = isSelected;
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public String getText() {

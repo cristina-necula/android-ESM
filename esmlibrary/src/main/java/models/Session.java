@@ -1,5 +1,6 @@
 package models;
 
+import java.util.LinkedList;
 import java.util.UUID;
 
 /**
@@ -12,6 +13,8 @@ public class Session {
     private String userId;
     private String deviceId;
     private long endTime;
+    private long startTime;
+    private LinkedList<Action> userActions;
 
     public UUID getId() {
         return id;
@@ -37,8 +40,6 @@ public class Session {
         this.deviceId = deviceId;
     }
 
-    private long startTime;
-
     public long getStartTime() {
         return startTime;
     }
@@ -53,5 +54,17 @@ public class Session {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
+    }
+
+    public LinkedList<Action> getUserActions() {
+        return userActions;
+    }
+
+    public void setUserActions(LinkedList<Action> userActions) {
+        this.userActions = userActions;
+    }
+
+    public Session(){
+        userActions = new LinkedList<>();
     }
 }
