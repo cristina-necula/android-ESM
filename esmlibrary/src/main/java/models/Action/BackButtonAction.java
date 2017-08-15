@@ -1,4 +1,4 @@
-package models;
+package models.Action;
 
 import enums.ActionType;
 

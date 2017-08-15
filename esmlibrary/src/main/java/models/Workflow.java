@@ -2,6 +2,8 @@ package models;
 
 import java.util.LinkedList;
 
+import models.Action.Action;
+
 /**
  * Created by Cristina on 8/6/2017.
  */

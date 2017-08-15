@@ -3,6 +3,8 @@ package models;
 import java.util.LinkedList;
 import java.util.UUID;
 
+import models.Action.Action;
+
 /**
  * Created by Cristina on 5/6/2017.
  */
@@ -14,7 +16,7 @@ public class Session {
     private String deviceId;
     private long endTime;
     private long startTime;
-    private LinkedList<Action> userActions;
+    private LinkedList<Interaction> userIntercations;
 
     public UUID getId() {
         return id;
@@ -56,15 +58,15 @@ public class Session {
         this.endTime = endTime;
     }
 
-    public LinkedList<Action> getUserActions() {
-        return userActions;
+    public LinkedList<Interaction> getUserIntercations() {
+        return userIntercations;
     }
 
-    public void setUserActions(LinkedList<Action> userActions) {
-        this.userActions = userActions;
+    public void setUserIntercations(LinkedList<Interaction> userIntercations) {
+        this.userIntercations = userIntercations;
     }
 
     public Session(){
-        userActions = new LinkedList<>();
+        userIntercations = new LinkedList<>();
     }
 }

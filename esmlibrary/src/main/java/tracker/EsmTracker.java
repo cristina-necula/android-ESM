@@ -1,16 +1,15 @@
 package tracker;
 
 import android.content.Context;
-import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.view.View;
-import android.widget.Button;
 
 import java.util.UUID;
 
-import models.Action;
-import models.BackButtonAction;
-import models.ButtonAction;
+import models.Action.Action;
+import models.Action.BackButtonAction;
+import models.Action.ButtonAction;
+import models.Event.Event;
 import models.Session;
 
 /**
@@ -57,6 +56,10 @@ public class EsmTracker {
     }
 
     public void traceAction(Action action){
-        session.getUserActions().add(action);
+        session.getUserIntercations().add(action);
+    }
+
+    public void traceEvent(Event event){
+        session.getUserIntercations().add(event);
     }
 }
