@@ -7,6 +7,8 @@ package enums;
 public enum EventType {
 
     ActivityOpened,
-    ActivityClosed
+    ActivityClosed,
+    FragmentOpened,
+    FragmentClosed
 
 }

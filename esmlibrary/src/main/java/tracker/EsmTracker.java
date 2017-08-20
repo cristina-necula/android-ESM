@@ -10,7 +10,6 @@ import models.Action.Action;
 import models.Action.BackButtonAction;
 import models.Action.ButtonAction;
 import models.Event.Event;
-import models.Session;
 
 /**
  * Created by Cristina on 5/6/2017.

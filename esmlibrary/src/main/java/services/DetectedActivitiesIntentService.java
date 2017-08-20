@@ -18,14 +18,9 @@ import util.Constants;
 
 public class DetectedActivitiesIntentService extends IntentService {
 
-    protected static final String TAG = "DetectedActivitiesIS";
+    protected static final String TAG = "DetectedActivitiesIntentService";
 
-    /**
-     * This constructor is required, and calls the super IntentService(String)
-     * constructor with the name for a worker thread.
-     */
     public DetectedActivitiesIntentService() {
-        // Use the TAG to name the worker thread.
         super(TAG);
     }
 
@@ -34,32 +29,15 @@ public class DetectedActivitiesIntentService extends IntentService {
         super.onCreate();
     }
 
-    /**
-     * Handles incoming intents.
-     * @param intent The Intent is provided (inside a PendingIntent) when requestActivityUpdates()
-     *               is called.
-     */
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onHandleIntent(Intent intent) {
+
         ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
         Intent localIntent = new Intent(Constants.BROADCAST_ACTION);
-
-        // Get the list of the probable activities associated with the current state of the
-        // device. Each activity is associated with a confidence level, which is an int between
-        // 0 and 100.
         ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
 
-        // Log each activity.
-        Log.i(TAG, "activities detected");
-        for (DetectedActivity da: detectedActivities) {
-            Log.i(TAG, Constants.getActivityString(
-                    getApplicationContext(),
-                    da.getType()) + " " + da.getConfidence() + "%"
-            );
-        }
-
-        // Broadcast the list of detected activities.
         localIntent.putExtra(Constants.ACTIVITY_EXTRA, detectedActivities);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }

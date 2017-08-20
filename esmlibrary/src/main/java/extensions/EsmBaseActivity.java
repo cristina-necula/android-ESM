@@ -34,8 +34,11 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 
+import models.Action.BackButtonAction;
+import models.Event.ActivityOpenedEvent;
 import services.ActivityDetectionBroadcastReceiver;
 import services.DetectedActivitiesIntentService;
+import tracker.EsmTracker;
 import util.Constants;
 
 
@@ -47,6 +50,7 @@ public class EsmBaseActivity
         extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, ResultCallback<Status> {
 
+    //region Variables
     public FusedLocationProviderClient FusedLocationClient;
     public Location LastKnownLocation;
     public GoogleApiClient GoogleApiClient;
@@ -56,12 +60,10 @@ public class EsmBaseActivity
     protected ActivityDetectionBroadcastReceiver mBroadcastReceiver;
     protected GoogleApiClient mGoogleApiClient;
     private ArrayList<DetectedActivity> mDetectedActivities;
+    //endregion
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    //region Base Activity Functions
+    // call this in app activity to register for location updates
     public void requestUserLocation(){
         FusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (!checkPermissions()) {
@@ -71,7 +73,8 @@ public class EsmBaseActivity
         }
     }
 
-    public void recognizeUserActivity(Bundle savedInstanceState){
+    // call this in app activity to register for activity recognition
+    public void requestRecognitionOfUserActivity(Bundle savedInstanceState){
         mBroadcastReceiver = new ActivityDetectionBroadcastReceiver();
         if (savedInstanceState != null && savedInstanceState.containsKey(
                 Constants.DETECTED_ACTIVITIES)) {
@@ -84,7 +87,23 @@ public class EsmBaseActivity
             }
         }
         buildGoogleApiClient();
+        requestActivityUpdates();
     }
+
+    // call this to stop receiving activity updates
+    public void removeActivityUpdates() {
+        if (!mGoogleApiClient.isConnected()) {
+            return;
+        }
+
+        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+                mGoogleApiClient,
+                getActivityDetectionPendingIntent()
+        ).setResultCallback(this);
+    }
+    //endregion
+
+    //region Activiy Recognition Functions
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -95,36 +114,7 @@ public class EsmBaseActivity
                 .build();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
-                new IntentFilter(Constants.BROADCAST_ACTION));
-    }
-
-    @Override
-    protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        super.onPause();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "Connected to GoogleApiClient");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "Connection suspended");
-        mGoogleApiClient.connect();
-    }
-
-    public void requestActivityUpdatesButtonHandler(View view) {
+    private void requestActivityUpdates() {
         if (!mGoogleApiClient.isConnected()) {
             return;
         }
@@ -182,10 +172,45 @@ public class EsmBaseActivity
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    //endregion
+
+    //region Override methods
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
+                new IntentFilter(Constants.BROADCAST_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i(TAG, "Connected to GoogleApiClient");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "Connection suspended");
+        mGoogleApiClient.connect();
+    }
+
     @Override
     public void onStart() {
         super.onStart();
+        EsmTracker.getInstance().traceEvent(new ActivityOpenedEvent());
     }
+
+    //endregion
 
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
@@ -264,9 +289,13 @@ public class EsmBaseActivity
         }
     }
 
-
     public String getActivityName(){
         return this.getClass().getSimpleName();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        EsmTracker.getInstance().traceAction(new BackButtonAction());
+    }
 }

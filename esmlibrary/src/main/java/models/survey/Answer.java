@@ -1,4 +1,4 @@
-package models;
+package models.survey;
 
 /**
  * Created by Cristina on 5/8/2017.
