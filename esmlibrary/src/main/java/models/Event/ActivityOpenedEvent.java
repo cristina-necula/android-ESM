@@ -1,5 +1,7 @@
 package models.Event;
 
+import java.util.UUID;
+
 import enums.EventType;
 
 /**
@@ -10,5 +12,6 @@ public class ActivityOpenedEvent extends Event {
 
     public ActivityOpenedEvent() {
         Type = EventType.ActivityOpened;
+        Uuid = UUID.randomUUID();
     }
 }

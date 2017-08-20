@@ -1,5 +1,7 @@
 package models.Action;
 
+import java.util.UUID;
+
 import enums.ActionType;
 
 /**
@@ -9,7 +11,9 @@ import enums.ActionType;
 public class BackButtonAction extends Action {
 
     public BackButtonAction(){
+
         Type = ActionType.Back;
+        Uuid = UUID.randomUUID();
     }
 
 }

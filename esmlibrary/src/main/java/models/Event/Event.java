@@ -1,5 +1,7 @@
 package models.Event;
 
+import java.util.UUID;
+
 import enums.EventType;
 import Interfaces.Interaction;
 
@@ -10,5 +12,6 @@ import Interfaces.Interaction;
 public abstract class Event implements Interaction {
 
     public EventType Type;
+    public UUID Uuid;
 
 }

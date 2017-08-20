@@ -2,6 +2,8 @@ package models.Action;
 
 import android.location.Location;
 
+import java.util.UUID;
+
 import enums.ActionType;
 import Interfaces.Interaction;
 
@@ -15,5 +17,6 @@ public abstract class Action implements Interaction {
     public String Tag;
     public long Timestamp;
     public Location Location;
+    public UUID Uuid;
 
 }

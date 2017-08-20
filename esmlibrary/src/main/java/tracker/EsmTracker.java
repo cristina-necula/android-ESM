@@ -4,12 +4,15 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
+import Interfaces.Interaction;
 import models.Action.Action;
 import models.Action.BackButtonAction;
 import models.Action.ButtonAction;
 import models.Event.Event;
+import models.survey.Survey;
 
 /**
  * Created by Cristina on 5/6/2017.
@@ -20,12 +23,22 @@ public class EsmTracker {
 
     private Session session;
 
-    public static EsmTracker getInstance() {
-        return instance;
+    private ArrayList<Workflow> workflows;
+
+    public ArrayList<Workflow> getWorkflows() {
+        return workflows;
+    }
+
+    public void setWorkflows(ArrayList<Workflow> workflows) {
+        this.workflows = workflows;
     }
 
     private EsmTracker() {
         session = new Session();
+    }
+
+    public static EsmTracker getInstance() {
+        return instance;
     }
 
     public void startSession(Context context, String userId){
@@ -44,21 +57,37 @@ public class EsmTracker {
         Action action = new ButtonAction();
         action.Timestamp = System.currentTimeMillis();
         action.Tag = view.getTag().toString();
-        EsmTracker.getInstance().traceAction(action);
+        EsmTracker.getInstance().traceInteraction(action);
     }
 
     public void traceBackButtonAction(){
         Action action = new BackButtonAction();
         action.Timestamp = System.currentTimeMillis();
         action.Tag = "BackButtonPressed";
-        EsmTracker.getInstance().traceAction(action);
+        EsmTracker.getInstance().traceInteraction(action);
     }
 
-    public void traceAction(Action action){
-        session.getUserIntercations().add(action);
+    public void traceInteraction(Interaction interaction){
+        session.getUserIntercations().add(interaction);
+
+        Survey survey = shouldTriggerSurvey();
+        if(survey != null){
+            showSurvey(survey);
+        }
     }
 
-    public void traceEvent(Event event){
-        session.getUserIntercations().add(event);
+    public Survey shouldTriggerSurvey(){
+        for (Interaction interaction: session.getUserIntercations()) {
+            for(Workflow workflow : workflows){
+                for(TrackedSession session : workflow.getTrackedSessions()){
+                    
+                }
+            }
+        }
+        return null;
+    }
+
+    private void showSurvey(Survey survey){
+
     }
 }
