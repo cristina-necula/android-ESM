@@ -3,7 +3,7 @@ package models;
 import java.util.LinkedList;
 import java.util.UUID;
 
-import models.Action.Action;
+import Interfaces.Interaction;
 
 /**
  * Created by Cristina on 5/6/2017.

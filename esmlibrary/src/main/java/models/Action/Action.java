@@ -2,11 +2,8 @@ package models.Action;
 
 import android.location.Location;
 
-import java.security.Timestamp;
-import java.util.UUID;
-
 import enums.ActionType;
-import models.Interaction;
+import Interfaces.Interaction;
 
 /**
  * Created by Cristina on 8/6/2017.

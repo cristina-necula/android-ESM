@@ -1,7 +1,7 @@
 package models.Event;
 
 import enums.EventType;
-import models.Interaction;
+import Interfaces.Interaction;
 
 /**
  * Created by Cristina on 5/6/2017.

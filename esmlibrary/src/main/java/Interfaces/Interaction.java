@@ -1,4 +1,4 @@
-package models;
+package Interfaces;
 
 /**
  * Created by Cristina on 8/15/2017.
