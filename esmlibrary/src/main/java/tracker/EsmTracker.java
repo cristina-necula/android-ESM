@@ -11,7 +11,6 @@ import Interfaces.Interaction;
 import models.Action.Action;
 import models.Action.BackButtonAction;
 import models.Action.ButtonAction;
-import models.Event.Event;
 import models.survey.Survey;
 
 /**
@@ -23,14 +22,14 @@ public class EsmTracker {
 
     private Session session;
 
-    private ArrayList<Workflow> workflows;
+    private ArrayList<Workflow> workflowList;
 
-    public ArrayList<Workflow> getWorkflows() {
-        return workflows;
+    public ArrayList<Workflow> getWorkflowList() {
+        return workflowList;
     }
 
-    public void setWorkflows(ArrayList<Workflow> workflows) {
-        this.workflows = workflows;
+    public void setWorkflowList(ArrayList<Workflow> workflows) {
+        this.workflowList = workflows;
     }
 
     private EsmTracker() {
@@ -77,11 +76,9 @@ public class EsmTracker {
     }
 
     public Survey shouldTriggerSurvey(){
-        for (Interaction interaction: session.getUserIntercations()) {
-            for(Workflow workflow : workflows){
-                for(TrackedSession session : workflow.getTrackedSessions()){
-                    
-                }
+        for (Workflow workflow : workflowList) {
+            for (Interaction interaction : workflow.getInteractions()){
+
             }
         }
         return null;
