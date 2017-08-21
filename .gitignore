@@ -11,3 +11,4 @@
 /esmlibrary/build
 AndroidESM/app/build
 AndroidESM/esmlibrary/build
+gradle.properties
