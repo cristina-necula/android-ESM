@@ -35,6 +35,9 @@ public class Session {
     }
 
     public ArrayList<Event> getEvents() {
+        if(events == null){
+            events = new ArrayList<>();
+        }
         return events;
     }
 

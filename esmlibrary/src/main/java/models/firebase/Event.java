@@ -2,10 +2,16 @@ package models.firebase;
 
 import android.location.*;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Cristina on 8/21/2017.
  */
-
+@IgnoreExtraProperties
 public class Event {
 
     long timestamp;
@@ -61,5 +67,19 @@ public class Event {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap(){
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put("timestamp", timestamp);
+        map.put("type", type);
+        map.put("tag", tag);
+        map.put("containerActivityName", containerActivityName);
+        map.put("detectedUserActivity", detectedUserActivity);
+        map.put("location", location);
+
+        return map;
     }
 }

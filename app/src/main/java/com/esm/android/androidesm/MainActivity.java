@@ -21,7 +21,7 @@ public class MainActivity extends EsmBaseActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        EsmTracker.getInstance().startSession(getApplicationContext(), "TODO_userId");
+        EsmTracker.getInstance().addActivityStartedEvent(this);
 
     }
 

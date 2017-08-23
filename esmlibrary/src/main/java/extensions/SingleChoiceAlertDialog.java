@@ -11,7 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.esm.android.esmlibrary.R;
 
-import models.survey.Survey;
+import models.firebase.Survey;
+
 
 /**
  * Created by Cristina on 8/20/2017.
@@ -53,7 +54,7 @@ public class SingleChoiceAlertDialog extends DialogFragment {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        survey.setSelectedAnswer(selectedAnswerIndex);
+                        survey.setSelectedAnswer(survey.getStringAnswers()[selectedAnswerIndex], true);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

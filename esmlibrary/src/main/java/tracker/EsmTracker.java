@@ -2,22 +2,20 @@ package tracker;
 
 import android.content.Context;
 import android.provider.Settings.Secure;
-import android.util.Log;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
+import extensions.EsmBaseActivity;
+import models.firebase.Event;
+import models.firebase.Location;
 import models.firebase.Session;
 import models.firebase.User;
+import models.firebase.Workflow;
 import util.Constants;
+import util.FirebaseHelper;
 
 /**
  * Created by Cristina on 5/6/2017.
@@ -51,46 +49,58 @@ public class EsmTracker {
         return instance;
     }
 
-    public void startSession(Context context, String userEmail){
+    public void startSession(Context context, String username){
 
         String deviceId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+        final String userKey = username + "-" + deviceId;
         final User user = new User();
+
         user.setDeviceId(deviceId);
-        user.setEmail(userEmail);
-
-        final String userKey = userEmail + "-" + deviceId;
-
-        // add user to db if it does not exist
-        firebaseDatabase.child(Constants.USERS_NODE).child(userKey)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    firebaseDatabase.child(Constants.USERS_NODE)
-                            .child(userKey)
-                            .setValue(user);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                Log.d("Firebase error", firebaseError.getMessage());
-            }
-        });
+        user.setUsername(username.replace(".", ""));
+        FirebaseHelper.addUser(firebaseDatabase, user, userKey);
 
         session.setStartTime(System.currentTimeMillis());
         session.setUserKey(userKey);
-
         currentSessionKey = firebaseDatabase.child(Constants.SESSIONS_NODE).push().getKey();
-        Map<String, Object> sessionValues = session.toMap();
 
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/" + Constants.SESSIONS_NODE + "/" + currentSessionKey, sessionValues);
-        childUpdates.put("/" + Constants.USER_SESSIONS_NODE + "/" + session.getUserKey()
-                + "/" + currentSessionKey, sessionValues);
+        FirebaseHelper.addNewSession(firebaseDatabase, session, currentSessionKey);
+    }
 
-        firebaseDatabase.updateChildren(childUpdates);
+    public void addButtonClickEvent(EsmBaseActivity activity, String buttonTag){
+        Event event = new Event();
+        event.setTag(buttonTag);
+        event.setTimestamp(System.currentTimeMillis());
+        event.setContainerActivityName(activity.getActivityName());
+        event.setType("ButtonClick");
+
+        activity.requestUserLocation();
+        if(activity.LastKnownLocation != null){
+            Location location = new Location();
+            location.setLatitude(activity.LastKnownLocation.getLatitude());
+            location.setLongitude(activity.LastKnownLocation.getLongitude());
+            location.setName(activity.getLastLocationName());
+            event.setLocation(location);
+        }
+        session.getEvents().add(event);
+        FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
+    }
+
+    public void addActivityStartedEvent(EsmBaseActivity activity){
+        Event event = new Event();
+        event.setTimestamp(System.currentTimeMillis());
+        event.setContainerActivityName(activity.getActivityName());
+        event.setType("ActivityStarted");
+
+        activity.requestUserLocation();
+        if(activity.LastKnownLocation != null){
+            Location location = new Location();
+            location.setLatitude(activity.LastKnownLocation.getLatitude());
+            location.setLongitude(activity.LastKnownLocation.getLongitude());
+            location.setName(activity.getLastLocationName());
+            event.setLocation(location);
+        }
+        session.getEvents().add(event);
+        FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
     }
 
     public void endSession(){

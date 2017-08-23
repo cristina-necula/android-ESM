@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,13 +34,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-import models.Action.BackButtonAction;
-import models.Event.ActivityOpenedEvent;
 import services.ActivityDetectionBroadcastReceiver;
 import services.DetectedActivitiesIntentService;
-import tracker.EsmTracker;
 import util.Constants;
 
 
@@ -55,7 +57,7 @@ public class EsmBaseActivity
     public Location LastKnownLocation;
     public GoogleApiClient GoogleApiClient;
     public int MainActivityContainerId;
-    protected static final String TAG = "MainActivity";
+    protected static final String TAG = "BaseActivity";
 
     protected ActivityDetectionBroadcastReceiver mBroadcastReceiver;
     protected GoogleApiClient mGoogleApiClient;
@@ -112,6 +114,7 @@ public class EsmBaseActivity
                 .addOnConnectionFailedListener(this)
                 .addApi(ActivityRecognition.API)
                 .build();
+        mGoogleApiClient.connect();
     }
 
     private void requestActivityUpdates() {
@@ -207,7 +210,7 @@ public class EsmBaseActivity
     @Override
     public void onStart() {
         super.onStart();
-        EsmTracker.getInstance().traceEvent(new ActivityOpenedEvent());
+        //EsmTracker.getInstance().traceEvent(new ActivityOpenedEvent());
     }
 
     //endregion
@@ -222,10 +225,27 @@ public class EsmBaseActivity
                             LastKnownLocation = task.getResult();
                         } else {
                             Log.w("LOCATION", "getLastLocation:exception", task.getException());
-                            showSnackbar("No location detected");
                         }
                     }
                 });
+    }
+
+    public String getLastLocationName(){
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        List<Address> list = null;
+        try {
+            list = geocoder.getFromLocation(
+                    LastKnownLocation.getLatitude(),
+                    LastKnownLocation.getLongitude(), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (list != null & list.size() > 0) {
+            Address address = list.get(0);
+            return address.getLocality();
+        }
+
+        return null;
     }
 
     private void showSnackbar(final String text) {
@@ -296,6 +316,6 @@ public class EsmBaseActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        EsmTracker.getInstance().traceAction(new BackButtonAction());
+        //EsmTracker.getInstance().traceAction(new BackButtonAction());
     }
 }

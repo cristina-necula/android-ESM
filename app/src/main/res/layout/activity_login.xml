@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:hint="Enter email"
+        android:hint="Enter username"
         android:inputType="textEmailAddress"
         android:id="@+id/email_edit_text"/>
 
@@ -33,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign in"
-        android:id="@+id/sign_in_button"/>
+        android:id="@+id/sign_in_button"
+        android:tag="SignInButton"/>
 
 </LinearLayout>

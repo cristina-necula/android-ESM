@@ -10,8 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-import models.survey.Answer;
-import models.survey.Survey;
+import models.firebase.Answer;
+import models.firebase.Survey;
+
 
 /**
  * Created by Cristina on 8/20/2017.
@@ -43,23 +44,25 @@ public class MultipleChoiceAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final String[] surveyStringAnswers = survey.getStringAnswers();
+
         builder.setTitle(survey.getQuestion())
                 .setMultiChoiceItems(survey.getStringAnswers(), null,
                         new DialogInterface.OnMultiChoiceClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if(isChecked){
-                            selectedAnswers.remove(which);
+                            survey.setSelectedAnswer(surveyStringAnswers[which], false);
                         }
                         else {
-                            selectedAnswers.add(survey.getAnswers().get(which));
+                            survey.setSelectedAnswer(surveyStringAnswers[which], true);
                         }
                     }
                 })
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        survey.setSelectedAnswers(selectedAnswers);
+                        survey.setDismissed(false);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
