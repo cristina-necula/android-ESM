@@ -12,6 +12,12 @@ import com.google.android.gms.location.DetectedActivity;
 
 final public class Constants {
 
+    public static final String USERS_NODE = "users";
+
+    public static final String SESSIONS_NODE = "sessions";
+
+    public static final String USER_SESSIONS_NODE = "user-sessions";
+
     public static final int REQUEST_LOCATION_PERMISSIONS_CODE = 6890;
 
     private static final String PACKAGE_NAME = "com.google.android.gms.location.activityrecognition";
