@@ -12,3 +12,5 @@
 AndroidESM/app/build
 AndroidESM/esmlibrary/build
 gradle.properties
+/app/google-services.json
+
