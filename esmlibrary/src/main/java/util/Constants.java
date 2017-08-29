@@ -18,6 +18,8 @@ final public class Constants {
 
     public static final String USER_SESSIONS_NODE = "user-sessions";
 
+    public static final String USER_WORKFLOWS_NODE = "user-workflows";
+
     public static final int REQUEST_LOCATION_PERMISSIONS_CODE = 6890;
 
     private static final String PACKAGE_NAME = "com.google.android.gms.location.activityrecognition";

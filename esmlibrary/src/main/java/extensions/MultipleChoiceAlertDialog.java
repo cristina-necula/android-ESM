@@ -44,10 +44,10 @@ public class MultipleChoiceAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final String[] surveyStringAnswers = survey.getStringAnswers();
+        final CharSequence[] surveyStringAnswers = survey.getStringAnswers();
 
         builder.setTitle(survey.getQuestion())
-                .setMultiChoiceItems(survey.getStringAnswers(), null,
+                .setMultiChoiceItems(surveyStringAnswers, null,
                         new DialogInterface.OnMultiChoiceClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {

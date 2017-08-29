@@ -8,6 +8,15 @@ public class User {
 
     String username;
     String deviceId;
+    String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public String getUsername() {
         return username;

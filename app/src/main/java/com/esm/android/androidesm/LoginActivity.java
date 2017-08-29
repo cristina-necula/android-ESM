@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import Interfaces.Interaction;
 import extensions.EsmBaseActivity;
 import tracker.EsmTracker;
 
@@ -19,6 +18,8 @@ public class LoginActivity extends EsmBaseActivity implements View.OnClickListen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EsmTracker.getInstance().startSession(this, "cristinanecula");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -35,21 +36,34 @@ public class LoginActivity extends EsmBaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.sign_in_button:
+
                 String username = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString();
-                if(username != null && username != "" && username != " " ||
-                        password != null && password != "" && password != " "){
-                    EsmTracker.getInstance().startSession(this, username);
-                    EsmTracker.getInstance().addActivityStartedEvent(this);
+
+                if(checkPassword(password) && checkUsername(username)){
+
                     EsmTracker.getInstance().addButtonClickEvent(this, v.getTag().toString());
 
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                 }
                 else {
-                    Toast.makeText(this, "Fill in username and password", Toast.LENGTH_SHORT);
+                    if(!checkPassword(password)) {
+                        EsmTracker.getInstance().addTextError(this, "password_text_view");
+                    }
+                    if(!checkUsername(username)){
+                        EsmTracker.getInstance().addTextError(this, "username_text_view");
+                    }
                 }
                 break;
         }
+    }
+
+    public boolean checkPassword(String password){
+        return password != null && password != "" && password != " ";
+    }
+
+    public boolean checkUsername(String username){
+        return username != null && username != "" && username != " ";
     }
 }

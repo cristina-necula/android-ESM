@@ -3,6 +3,7 @@ package models.firebase;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,15 @@ public class Survey {
     Map<String, Answer> answerMap;
     boolean isSingleChoice;
     boolean isDismissed;
+    Map<String, Object> answers;
+
+    public Map<String, Object> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(Map<String, Object> answers) {
+        this.answers = answers;
+    }
 
     public boolean isDismissed() {
         return isDismissed;
@@ -41,6 +51,11 @@ public class Survey {
         isSingleChoice = singleChoice;
     }
 
+    public Survey(){
+        answerMap = new HashMap<>();
+        answers = new HashMap<>();
+    }
+
     public Map<String, Answer> getAnswerMap() {
         return answerMap;
     }
@@ -50,7 +65,7 @@ public class Survey {
     }
 
     @Exclude
-    public String[] getStringAnswers(){
+    public CharSequence[] getStringAnswers(){
         String[] stringAnswers = new String[answerMap.size()];
         int i = 0;
         for (Answer answer : answerMap.values()) {
@@ -61,7 +76,17 @@ public class Survey {
     }
 
     @Exclude
-    public void setSelectedAnswer(String answerText, boolean isSelected){
+    public void setSelectedAnswer(CharSequence answerText){
+        for(Answer answer : answerMap.values()){
+            if(answer.getText().equals(answerText)){
+                answer.setSelected(!answer.isSelected());
+                break;
+            }
+        }
+    }
+
+    @Exclude
+    public void setSelectedAnswer(CharSequence answerText, boolean isSelected){
         for(Answer answer : answerMap.values()){
             if(answer.getText().equals(answerText)){
                 answer.setSelected(isSelected);

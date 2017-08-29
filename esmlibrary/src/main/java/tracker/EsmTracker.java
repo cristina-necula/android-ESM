@@ -2,16 +2,23 @@ package tracker;
 
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 
 import extensions.EsmBaseActivity;
+import extensions.SingleChoiceAlertDialog;
 import models.firebase.Event;
 import models.firebase.Location;
 import models.firebase.Session;
+import models.firebase.Survey;
 import models.firebase.User;
 import models.firebase.Workflow;
 import util.Constants;
@@ -21,6 +28,12 @@ import util.FirebaseHelper;
  * Created by Cristina on 5/6/2017.
  */
 public class EsmTracker {
+
+    private boolean activeFlag;
+
+    private EsmBaseActivity currentActivity;
+
+    private String currentWorkflowKey;
 
     private static EsmTracker instance = new EsmTracker();
 
@@ -49,14 +62,24 @@ public class EsmTracker {
         return instance;
     }
 
-    public void startSession(Context context, String username){
+    public void startSession(EsmBaseActivity activity, String username){
 
-        String deviceId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+        currentActivity = activity;
+
+        if(activeFlag){
+            return;
+        }
+
+        activeFlag = true;
+
+        String deviceId = Secure.getString(activity.getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
         final String userKey = username + "-" + deviceId;
         final User user = new User();
 
         user.setDeviceId(deviceId);
         user.setUsername(username.replace(".", ""));
+        user.setToken(FirebaseInstanceId.getInstance().getToken());
         FirebaseHelper.addUser(firebaseDatabase, user, userKey);
 
         session.setStartTime(System.currentTimeMillis());
@@ -67,6 +90,9 @@ public class EsmTracker {
     }
 
     public void addButtonClickEvent(EsmBaseActivity activity, String buttonTag){
+
+        currentActivity = activity;
+
         Event event = new Event();
         event.setTag(buttonTag);
         event.setTimestamp(System.currentTimeMillis());
@@ -81,15 +107,34 @@ public class EsmTracker {
             location.setName(activity.getLastLocationName());
             event.setLocation(location);
         }
-        session.getEvents().add(event);
+        session.addEvent(event);
         FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
     }
 
+    public void showSurvey(String surveyKey, String workflowKey){
+        currentWorkflowKey = workflowKey;
+        Task<Survey> surveyTask = FirebaseHelper.getSurvey(surveyKey, firebaseDatabase);
+
+        surveyTask.addOnCompleteListener(new OnCompleteListener<Survey>() {
+            @Override
+            public void onComplete(@NonNull Task<Survey> task) {
+                SingleChoiceAlertDialog singleChoiceAlertDialog = new SingleChoiceAlertDialog();
+                singleChoiceAlertDialog.setSurvey(task.getResult());
+                singleChoiceAlertDialog.setCurrentActivity(currentActivity);
+                singleChoiceAlertDialog.show(currentActivity.getSupportFragmentManager(), "");
+            }
+        });
+    }
+
     public void addActivityStartedEvent(EsmBaseActivity activity){
+
+        currentActivity = activity;
+
         Event event = new Event();
         event.setTimestamp(System.currentTimeMillis());
         event.setContainerActivityName(activity.getActivityName());
         event.setType("ActivityStarted");
+        event.setTag("Opened");
 
         activity.requestUserLocation();
         if(activity.LastKnownLocation != null){
@@ -99,48 +144,63 @@ public class EsmTracker {
             location.setName(activity.getLastLocationName());
             event.setLocation(location);
         }
-        session.getEvents().add(event);
+        session.addEvent(event);
         FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
+    }
+
+    public void onTokenRefresh(String token){
+        FirebaseHelper.addDeviceToken(token, session, firebaseDatabase);
     }
 
     public void endSession(){
         session.setEndTime(System.currentTimeMillis());
-        // TODO - send local data to server
+        FirebaseHelper.endSession(firebaseDatabase, currentSessionKey);
     }
 
-//    public void traceButtonAction(View view){
-//        Action action = new ButtonAction();
-//        action.Timestamp = System.currentTimeMillis();
-//        action.Tag = view.getTag().toString();
-//        EsmTracker.getInstance().traceInteraction(action);
-//    }
-//
-//    public void traceBackButtonAction(){
-//        Action action = new BackButtonAction();
-//        action.Timestamp = System.currentTimeMillis();
-//        action.Tag = "BackButtonPressed";
-//        EsmTracker.getInstance().traceInteraction(action);
-//    }
+    public void traceBackButtonAction(EsmBaseActivity activity) {
 
-//    public void traceInteraction(Interaction interaction){
-//        session.getUserIntercations().add(interaction);
-//
-//        Survey survey = shouldTriggerSurvey();
-//        if(survey != null){
-//            showSurvey(survey);
-//        }
-//    }
-//
-//    public Survey shouldTriggerSurvey(){
-//        for (Workflow workflow : workflowList) {
-//            for (Interaction interaction : workflow.getInteractions()){
-//
-//            }
-//        }
-//        return null;
-//    }
-//
-//    private void showSurvey(Survey survey){
-//
-//    }
+        currentActivity = activity;
+
+        Event event = new Event();
+        event.setTimestamp(System.currentTimeMillis());
+        event.setContainerActivityName(activity.getActivityName());
+        event.setType("BackButtonPressed");
+        event.setTag("BackButton");
+
+        activity.requestUserLocation();
+        if(activity.LastKnownLocation != null){
+            Location location = new Location();
+            location.setLatitude(activity.LastKnownLocation.getLatitude());
+            location.setLongitude(activity.LastKnownLocation.getLongitude());
+            location.setName(activity.getLastLocationName());
+            event.setLocation(location);
+        }
+        session.addEvent(event);
+        FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
+    }
+
+    public void saveSurvey(Survey survey){
+
+    }
+
+    public void addTextError(EsmBaseActivity activity, String tag){
+        currentActivity = activity;
+
+        Event event = new Event();
+        event.setTimestamp(System.currentTimeMillis());
+        event.setContainerActivityName(activity.getActivityName());
+        event.setType("Error");
+        event.setTag(tag);
+
+        activity.requestUserLocation();
+        if(activity.LastKnownLocation != null){
+            Location location = new Location();
+            location.setLatitude(activity.LastKnownLocation.getLatitude());
+            location.setLongitude(activity.LastKnownLocation.getLongitude());
+            location.setName(activity.getLastLocationName());
+            event.setLocation(location);
+        }
+        session.addEvent(event);
+        FirebaseHelper.addEventToSession(firebaseDatabase, session, currentSessionKey);
+    }
 }

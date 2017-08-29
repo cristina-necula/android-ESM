@@ -35,9 +35,6 @@ public class Session {
     }
 
     public ArrayList<Event> getEvents() {
-        if(events == null){
-            events = new ArrayList<>();
-        }
         return events;
     }
 
@@ -53,7 +50,27 @@ public class Session {
         this.userKey = userKey;
     }
 
-    public Session(){ }
+    public Session(){
+        events = new ArrayList<>();
+    }
+
+    public void addEvent(Event event){
+        events.add(event);
+        if(events.size() > 4){
+            int size = events.size();
+            if(events.get(size - 1).getContainerActivityName()
+                    .equals(events.get(size - 4).getContainerActivityName())
+                    && !events.get(size - 1).isError()
+                    && !events.get(size - 2).isError()
+                    && !events.get(size - 3).isError()
+                    && !events.get(size - 4).isError()){
+                events.get(size - 2).setError(true);
+                events.get(size - 3).setError(true);
+                events.get(size - 4).setError(true);
+                // // TODO: 8/30/2017 show survey for error
+            }
+        }
+    }
 
     @Exclude
     public Map<String, Object> toMap(){

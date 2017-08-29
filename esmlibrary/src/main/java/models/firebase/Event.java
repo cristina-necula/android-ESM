@@ -20,6 +20,15 @@ public class Event {
     String containerActivityName;
     String detectedUserActivity;
     Location location;
+    boolean error;
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
+    }
 
     public long getTimestamp() {
         return timestamp;
@@ -79,6 +88,7 @@ public class Event {
         map.put("containerActivityName", containerActivityName);
         map.put("detectedUserActivity", detectedUserActivity);
         map.put("location", location);
+        map.put("error", error);
 
         return map;
     }

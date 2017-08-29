@@ -41,6 +41,7 @@ import java.util.Locale;
 
 import services.ActivityDetectionBroadcastReceiver;
 import services.DetectedActivitiesIntentService;
+import tracker.EsmTracker;
 import util.Constants;
 
 
@@ -210,7 +211,7 @@ public class EsmBaseActivity
     @Override
     public void onStart() {
         super.onStart();
-        //EsmTracker.getInstance().traceEvent(new ActivityOpenedEvent());
+        EsmTracker.getInstance().addActivityStartedEvent(this);
     }
 
     //endregion
@@ -232,6 +233,8 @@ public class EsmBaseActivity
 
     public String getLastLocationName(){
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        if(!geocoder.isPresent())
+            return "";
         List<Address> list = null;
         try {
             list = geocoder.getFromLocation(
@@ -315,7 +318,16 @@ public class EsmBaseActivity
 
     @Override
     public void onBackPressed() {
+        EsmTracker.getInstance().traceBackButtonAction(this);
         super.onBackPressed();
-        //EsmTracker.getInstance().traceAction(new BackButtonAction());
     }
+
+    @Override
+    protected void onStop() {
+        EsmTracker.getInstance().endSession();
+        super.onStop();
+    }
+
+
+
 }
